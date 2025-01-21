@@ -4,10 +4,10 @@ from loguru import logger
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine, async_sessionmaker
 
-from config import DB_CONNECT
+from config import DATABASE_URL_ASYNC
 
 # Initialize database engine and session maker
-async_engine: AsyncEngine = create_async_engine(DB_CONNECT, future=True, pool_size=50, max_overflow=50)
+async_engine: AsyncEngine = create_async_engine(DATABASE_URL_ASYNC, future=True, pool_size=50, max_overflow=50)
 async_session = async_sessionmaker(bind=async_engine, expire_on_commit=False)
 
 from functools import wraps
