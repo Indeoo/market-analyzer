@@ -2,7 +2,7 @@ import os
 
 TOKEN=os.getenv("TELEGRAM_TOKEN")
 JUPITER_REFERRAL_CONF = os.getenv("JUPITER_REFERRAL_CONF")
-DATABASE_URL = os.getenv("DATABASE_URL", default="postgres://myuser:mypassword@localhost:5432/mydatabase").replace("postgres://", "postgresql+asyncpg://")
+DATABASE_URL_ASYNC = os.getenv("DATABASE_URL", default="postgres://myuser:mypassword@localhost:5432/mydatabase").replace("postgres://", "postgresql+asyncpg://")
 DATABASE_URL_SYNC = os.getenv("DATABASE_URL", default="postgres://myuser:mypassword@localhost:5432/mydatabase").replace("postgres://", "postgresql+psycopg2://")
 RPC_ENDPOINT = os.getenv("RPC_ENDPOINT")
 SEND_RPC_ENDPOINT=os.getenv("SEND_RPC_ENDPOINT")
