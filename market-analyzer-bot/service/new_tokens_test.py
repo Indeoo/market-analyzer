@@ -24,8 +24,8 @@ async def process_new_tokens(context, update, user_id):
             for new_token in new_tokens:
                 text = (
                     f"!!!NEW TOKEN ON JUPITER!!!\n"
-                    f"Token address: {new_token.address}\n"
-                    f"Token name: {new_token.name}\n"
+                    f"Address: {new_token.address}\n"
+                    f"Name: {new_token.name}\n"
                     f"Trade: https://jup.ag/swap/{new_token.address}-SOL"
                 )
                 await context.bot.send_message(
@@ -39,7 +39,7 @@ async def process_new_tokens(context, update, user_id):
 
 
 async def find_new_tokens():
-    jupiter = requests.get("https://tokens.jup.ag/tokens?tags=verified")
+    jupiter = requests.get("https://tokens.jup.ag/tokens")
     data = jupiter.json()
 
     # Sort the data by 'created_at'
