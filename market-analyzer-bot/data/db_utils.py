@@ -100,6 +100,14 @@ async def get_model_by_id(session, id, model_type):
     return model
 
 
+@readonly_session(async_engine)
+async def get_all_models(session, model_type):
+    from sqlalchemy.future import select
+    result = await session.execute(select(model_type))
+    models = result.scalars().all()
+    return models
+
+
 @write_session(async_engine)
 async def save_model(session, model):
         try:

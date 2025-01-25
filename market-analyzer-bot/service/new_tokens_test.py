@@ -3,7 +3,7 @@ from datetime import datetime
 from loguru import logger
 import asyncio
 
-from data.db_utils import save_model, model_exists
+from data.db_utils import save_model, get_all_models
 from data.models import Token
 
 
@@ -39,42 +39,39 @@ async def process_new_tokens(context, update, user_id):
 
 
 async def find_new_tokens():
-    jupiter = requests.get("https://tokens.jup.ag/tokens")
+    jupiter = requests.get("https://tokens.jup.ag/tokens?tags=verified")
     data = jupiter.json()
+    logger.info("Retrieved new tokens")
 
-    # Sort the data by 'created_at'
-    sorted_data = sorted(
-        data, key=lambda x: datetime.fromisoformat(x['created_at'].replace("Z", "+00:00"))
-    )
+    all_models = await get_all_models(Token)
+    logger.info("Get all stored tokens")
 
-    new_tokens = []
-    for token_data in sorted_data:
-        address = token_data['address']
+    # List of addresses in the `list1`
+    token_addresses = [token.address for token in all_models]
+    # New list of tokens that have addresses not in `list1`
+    new_tokens = [token_dict for token_dict in data if token_dict['address'] not in token_addresses]
 
-        # Check if the token exists
-        if not await model_exists(address, Token):
-            # Create a Token model instance
-            token = Token(
-                address=token_data['address'],
-                name=token_data['name'],
-                symbol=token_data['symbol'],
-                decimals=token_data['decimals'],
-                logo_uri=token_data.get('logoURI'),
-                tags=token_data.get('tags'),
-                daily_volume=token_data.get('daily_volume'),
-                created_at=normalize_datetime(token_data['created_at']),
-                freeze_authority=token_data.get('freeze_authority'),
-                mint_authority=token_data.get('mint_authority'),
-                permanent_delegate=token_data.get('permanent_delegate'),
-                minted_at=normalize_datetime(token_data.get('minted_at'))
-                if token_data.get('minted_at')
-                else None,
-                extensions=token_data.get('extensions'),
-            )
+    logger.info(f"New tokens amount: {len(new_tokens)}")
 
-            # Save the Token to the database
-            await save_model(token)
-            new_tokens.append(token)
+    for token_data in new_tokens:
+        token = Token(
+            address=token_data['address'],
+            name=token_data['name'],
+            symbol=token_data['symbol'],
+            decimals=token_data['decimals'],
+            logo_uri=token_data.get('logoURI'),
+            tags=token_data.get('tags'),
+            daily_volume=token_data.get('daily_volume'),
+            created_at=normalize_datetime(token_data['created_at']),
+            freeze_authority=token_data.get('freeze_authority'),
+            mint_authority=token_data.get('mint_authority'),
+            permanent_delegate=token_data.get('permanent_delegate'),
+            minted_at=normalize_datetime(token_data.get('minted_at'))
+            if token_data.get('minted_at')
+            else None,
+            extensions=token_data.get('extensions'),
+        )
+        await save_model(token)
 
     return new_tokens
 
