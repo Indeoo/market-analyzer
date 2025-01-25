@@ -1,0 +1,6 @@
+python-telegram-bot==21.7
+alembic==1.14.0
+asyncpg==0.30.0
+loguru==0.7.2
+psycopg2-binary==2.9.10
+greenlet==3.1.1
